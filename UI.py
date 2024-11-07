@@ -4,8 +4,8 @@ import npuzzle
 from multiprocessing import Process, Queue
 import time
 
-BOARDWIDTH = 4
-BOARDHEIGHT = 4
+# BOARDWIDTH = None
+# BOARDHEIGHT = None
 TILESIZE = 80
 WINDOWWIDTH = 640
 WINDOWHEIGHT = 480
@@ -30,8 +30,8 @@ BASICFONTSIZE = 20
 
 MESSAGECOLOR = LIGHTBLUE
 
-XMARGIN = int((WINDOWWIDTH - (TILESIZE * BOARDWIDTH + (BOARDWIDTH - 1))) / 2)
-YMARGIN = int((WINDOWHEIGHT - (TILESIZE * BOARDHEIGHT + (BOARDHEIGHT - 1))) / 2)
+# XMARGIN = int((WINDOWWIDTH - (TILESIZE * BOARDWIDTH + (BOARDWIDTH - 1))) / 2)
+# YMARGIN = int((WINDOWHEIGHT - (TILESIZE * BOARDHEIGHT + (BOARDHEIGHT - 1))) / 2)
 
 UP = 'Up'
 DOWN = 'Down'
@@ -299,11 +299,15 @@ def main():
 
     # Initialize Pygame
     pygame.init()
-    global FPSCLOCK, DISPLAYSURF, BASICFONT, TIME_SURF, TIME_RECT, NODES_SURF, NODES_RECT, TIMER_SURF, TIMER_RECT, DFS_SURF, DFS_RECT, IDS_SURF, IDS_RECT
+    global FPSCLOCK, DISPLAYSURF, BASICFONT, TIME_SURF, TIME_RECT, NODES_SURF, NODES_RECT, TIMER_SURF, TIMER_RECT, DFS_SURF, DFS_RECT, IDS_SURF, IDS_RECT, BOARDHEIGHT, BOARDWIDTH, XMARGIN, YMARGIN
     FPSCLOCK = pygame.time.Clock()
     DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
     pygame.display.set_caption('n-puzzle')
     BASICFONT = pygame.font.Font('freesansbold.ttf', BASICFONTSIZE)
+    BOARDHEIGHT = size
+    BOARDWIDTH = size
+    XMARGIN = int((WINDOWWIDTH - (TILESIZE * BOARDWIDTH + (BOARDWIDTH - 1))) / 2)
+    YMARGIN = int((WINDOWHEIGHT - (TILESIZE * BOARDHEIGHT + (BOARDHEIGHT - 1))) / 2)
 
     # Variables to track solution progress and metrics
     all_moves = []
