@@ -211,7 +211,6 @@ def IDS(given_state, size, max_depth):
             return solution, nodes_visited
     return None, nodes_visited
 
-
 def IDS_with_steps(given_state, size, max_depth, solution_queue):
     """
     Giải thuật IDS nhưng gửi các bước di chuyển qua Queue khi tìm thấy lời giải.
@@ -233,11 +232,6 @@ def IDS_with_steps(given_state, size, max_depth, solution_queue):
     solution_queue.put("DONE")
     elapsed_time = time() - start_time
     return elapsed_time, total_nodes_visited
-
-
-def solve_puzzle_IDS(initial_state, size, max_depth, solution_queue):
-    elapsed_time, nodes_visited = IDS_with_steps(initial_state, size, max_depth, solution_queue)
-    return elapsed_time, nodes_visited
 
 
 def readInput(filename):
