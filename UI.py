@@ -9,7 +9,7 @@ import time
 TILESIZE = 80
 WINDOWWIDTH = 640
 WINDOWHEIGHT = 480
-FPS = 30
+FPS = 60
 BLANK = None
 
 #                 R    G    B
@@ -49,9 +49,8 @@ def read_input_file(file_path):
             initial_state = [list(map(int, f.readline().strip().split())) for _ in range(size)]
             puzzles.append((size, initial_state))
 
-    # print(puzzles) # For debugging 
+    print(puzzles) 
     return puzzles
-
 
 # Read the output file and return the list of actions, number of explored nodes and runtime
 def read_output_file(file_path):
@@ -67,7 +66,6 @@ def read_output_file(file_path):
 
     return actions, num_explored_nodes, time_taken
 
-
 def get_initial_board(puzzles):
     # board = []
     # return the initial state of the first puzzle
@@ -78,7 +76,6 @@ def get_initial_board(puzzles):
                 board[row][col] = BLANK
     return board
 
-
 # Return the x and y of board coordinates of the blank space
 def get_blank_position(size, board):
     for x in range(size):
@@ -86,10 +83,9 @@ def get_blank_position(size, board):
             if board[x][y] == BLANK:
                 return (x, y)
 
-
 def make_move(board, move):
     blank_x, blank_y = get_blank_position(len(board), board)
-    # print("makemove", blank_x, blank_y)
+    print("makemove", blank_x, blank_y)
 
     if move == UP:
         board[blank_x][blank_y], board[blank_x + 1][blank_y] = board[blank_x + 1][blank_y], board[blank_x][blank_y]
@@ -100,23 +96,21 @@ def make_move(board, move):
     elif move == LEFT:
         board[blank_x][blank_y], board[blank_x][blank_y + 1] = board[blank_x][blank_y + 1], board[blank_x][blank_y]
 
-    # print("mm", board)
+    print("mm", board)
 
 def is_valid_move(board, move):
     blank_x, blank_y = get_blank_position(len(board), board)
-    # print("isvalidmove", blank_x, blank_y)
+    print("isvalidmove", blank_x, blank_y)
 
     return (move == UP and blank_x != len(board[0]) - 1) or \
            (move == DOWN and blank_x != 0) or \
            (move == LEFT and blank_y != len(board) - 1) or \
            (move == RIGHT and blank_y != 0)
 
-
 def get_left_top_of_tile(tile_x, tile_y):
     left = XMARGIN + (tile_x * TILESIZE) + (tile_x - 1)
     top = YMARGIN + (tile_y * TILESIZE) + (tile_y - 1)
     return left, top
-
 
 def get_move_spot(board, x, y):
     for tile_x in range(len(board)):
@@ -127,7 +121,6 @@ def get_move_spot(board, x, y):
                 return tile_x, tile_y
     return None, None
 
-
 def draw_tile(tile_x, tile_y, number, adjx=0, adjy=0):
     left, top = get_left_top_of_tile(tile_x, tile_y)
     pygame.draw.rect(DISPLAYSURF, TILECOLOR, (left + adjx, top + adjy, TILESIZE, TILESIZE))
@@ -136,14 +129,12 @@ def draw_tile(tile_x, tile_y, number, adjx=0, adjy=0):
     text_rect.center = left + int(TILESIZE / 2) + adjx, top + int(TILESIZE / 2) + adjy
     DISPLAYSURF.blit(text_surf, text_rect)
 
-
 def make_text(text, color, bgcolor, top, left):
     # create the Surface and Rect objects for some text.
     textSurf = BASICFONT.render(text, True, color, bgcolor)
     textRect = textSurf.get_rect()
     textRect.topleft = (top, left)
     return (textSurf, textRect)
-
 
 def draw_board(board, message):
     DISPLAYSURF.fill(BGCOLOR)
@@ -169,12 +160,11 @@ def draw_board(board, message):
     DISPLAYSURF.blit(IDS_SURF, IDS_RECT)
     DISPLAYSURF.blit(TIMER_SURF, TIMER_RECT)
 
-
 def slide_animation(board, direction, message, animationSpeed):
     # Note: This function does not check if the move is valid.
 
     blankx, blanky = get_blank_position(len(board), board)
-    # print("slideanim", blankx, blanky)
+    print("slideanim", blankx, blanky)
     if direction == UP:
         movex = blankx + 1
         movey = blanky 
@@ -187,7 +177,7 @@ def slide_animation(board, direction, message, animationSpeed):
     elif direction == RIGHT:
         movex = blankx 
         movey = blanky - 1
-    # print("mx, my", movex, movey)
+    print("mx, my", movex, movey)
     # prepare the base surface
     draw_board(board, message)
     baseSurf = DISPLAYSURF.copy()
@@ -211,7 +201,6 @@ def slide_animation(board, direction, message, animationSpeed):
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
-
 def get_spot_clicked(board, x, y):
     # from the x & y pixel coordinates, get the x & y board coordinates
     for tileX in range(len(board)):
@@ -222,7 +211,6 @@ def get_spot_clicked(board, x, y):
                 return (tileX, tileY)
     return (None, None)
 
-
 def check_for_quit():
     for event in pygame.event.get(QUIT):
         terminate()
@@ -230,7 +218,6 @@ def check_for_quit():
         if event.key == K_ESCAPE:
             terminate()
         pygame.event.post(event)
-
 
 def terminate():
     pygame.quit()
@@ -415,12 +402,12 @@ def main():
         DISPLAYSURF.blit(TIME_SURF, TIME_RECT)
         DISPLAYSURF.blit(NODES_SURF, NODES_RECT)
 
-        # If not timed out, perform the moves animation
-        if not timeout_reached and reversed_moves:
+        # Perform the moves animation
+        if reversed_moves:
             move = reversed_moves.pop(0)
             all_moves.pop(0)
             if is_valid_move(board, move):
-                slide_animation(board, move, "Simulating the solution...", 2)
+                slide_animation(board, move, "Simulating the solution...", 10)
                 make_move(board, move)
                 pygame.display.update()
                 FPSCLOCK.tick(FPS)

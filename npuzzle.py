@@ -264,8 +264,8 @@ def main():
     solutions = []
     for size, initial_state in inputs:
         start_time = time()
-        # solution, nodes_visited = DFS(initial_state, size)
-        solution, nodes_visited = IDS(initial_state, size, 80)
+        solution, nodes_visited = DFS(initial_state, size)
+        # solution, nodes_visited = IDS(initial_state, size, 80)
         elapsed_time = time() - start_time
         solutions.append((solution, nodes_visited, elapsed_time))
         print("Solution:", solution)
