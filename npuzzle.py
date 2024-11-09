@@ -133,6 +133,7 @@ def DFS_with_steps(given_state, size, solution_queue):
     visited = set()   
     nodes_visited = 0 
     start_time = time()
+    solution = []
         
     # Duyệt qua stack
     while stack:
@@ -145,7 +146,8 @@ def DFS_with_steps(given_state, size, solution_queue):
                 solution_queue.put(step)
             solution_queue.put("DONE")
             elapsed_time = time() - start_time
-            return elapsed_time, nodes_visited
+            solution.append(solution)
+            return elapsed_time, nodes_visited, len(solution) - 1
         
         state_hash = hash(tuple(current_node.state))
         visited.add(state_hash)
@@ -162,7 +164,7 @@ def DFS_with_steps(given_state, size, solution_queue):
     #trả về không tìm thấy lời giải và số nút đã duyệt 
     solution_queue.put("DONE")
     elapsed_time = time() - start_time 
-    return None, elapsed_time, nodes_visited
+    return None, elapsed_time, nodes_visited, len(solution) - 1
 
 # Hàm hiện thực giải thuật DLS (Giải thuật DFS có giới hạn độ sâu tìm kiếm)
 def DLS(given_state, size, max_depth):
@@ -217,6 +219,7 @@ def IDS_with_steps(given_state, size, max_depth, solution_queue):
     """
     start_time = time()
     total_nodes_visited = 0
+    solution = []
 
     for depth in range(1, max_depth + 1):
         solution, nodes_visited = DLS(given_state, size, depth)
@@ -227,11 +230,12 @@ def IDS_with_steps(given_state, size, max_depth, solution_queue):
                 solution_queue.put(step)
             solution_queue.put("DONE")
             elapsed_time = time() - start_time
-            return elapsed_time, total_nodes_visited
+            solution.append(solution)
+            return elapsed_time, total_nodes_visited, len(solution) - 1
     
     solution_queue.put("DONE")
     elapsed_time = time() - start_time
-    return elapsed_time, total_nodes_visited
+    return elapsed_time, total_nodes_visited, len(solution) - 1
 
 
 def readInput(filename):
@@ -264,8 +268,8 @@ def main():
     solutions = []
     for size, initial_state in inputs:
         start_time = time()
-        solution, nodes_visited = DFS(initial_state, size)
-        # solution, nodes_visited = IDS(initial_state, size, 80)
+        # solution, nodes_visited = DFS(initial_state, size)
+        solution, nodes_visited = IDS(initial_state, size, 80)
         elapsed_time = time() - start_time
         solutions.append((solution, nodes_visited, elapsed_time))
         print("Solution:", solution)

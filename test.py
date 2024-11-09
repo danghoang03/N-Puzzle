@@ -38,7 +38,7 @@ def write_puzzle_to_file(puzzle, k, filename="input.txt"):
             f.write(" ".join(map(str, row)) + "\n")  # Ghi từng hàng của ma trận
 
 # Yêu cầu người dùng nhập kích thước k
-k = int(input("Nhập kích thước ma trận (k x k): "))
-puzzle = generate_puzzle(k)
-write_puzzle_to_file(puzzle, k)
-print("Ma trận đã được ghi vào file input.txt.")
+# k = int(input("Nhập kích thước ma trận (k x k): "))
+# puzzle = generate_puzzle(k)
+# write_puzzle_to_file(puzzle, k)
+# print("Ma trận đã được ghi vào file input.txt.")

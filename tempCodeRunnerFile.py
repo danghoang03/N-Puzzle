@@ -1,1 +1,1 @@
-print
+total_moves = len(all_moves)

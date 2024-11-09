@@ -1,14 +1,13 @@
 import pygame, sys
 from pygame.locals import *
 import npuzzle
+import test
 from multiprocessing import Process, Queue
 import time
 
-# BOARDWIDTH = None
-# BOARDHEIGHT = None
 TILESIZE = 80
-WINDOWWIDTH = 640
-WINDOWHEIGHT = 480
+WINDOWWIDTH = 800
+WINDOWHEIGHT = 800
 FPS = 60
 BLANK = None
 
@@ -30,9 +29,6 @@ BASICFONTSIZE = 20
 
 MESSAGECOLOR = LIGHTBLUE
 
-# XMARGIN = int((WINDOWWIDTH - (TILESIZE * BOARDWIDTH + (BOARDWIDTH - 1))) / 2)
-# YMARGIN = int((WINDOWHEIGHT - (TILESIZE * BOARDHEIGHT + (BOARDHEIGHT - 1))) / 2)
-
 UP = 'Up'
 DOWN = 'Down'
 LEFT = 'Left'
@@ -49,7 +45,7 @@ def read_input_file(file_path):
             initial_state = [list(map(int, f.readline().strip().split())) for _ in range(size)]
             puzzles.append((size, initial_state))
 
-    print(puzzles) 
+    # print(puzzles) 
     return puzzles
 
 # Read the output file and return the list of actions, number of explored nodes and runtime
@@ -85,7 +81,7 @@ def get_blank_position(size, board):
 
 def make_move(board, move):
     blank_x, blank_y = get_blank_position(len(board), board)
-    print("makemove", blank_x, blank_y)
+    # print("makemove", blank_x, blank_y)
 
     if move == UP:
         board[blank_x][blank_y], board[blank_x + 1][blank_y] = board[blank_x + 1][blank_y], board[blank_x][blank_y]
@@ -96,11 +92,11 @@ def make_move(board, move):
     elif move == LEFT:
         board[blank_x][blank_y], board[blank_x][blank_y + 1] = board[blank_x][blank_y + 1], board[blank_x][blank_y]
 
-    print("mm", board)
+    # print("mm", board)
 
 def is_valid_move(board, move):
     blank_x, blank_y = get_blank_position(len(board), board)
-    print("isvalidmove", blank_x, blank_y)
+    # print("isvalidmove", blank_x, blank_y)
 
     return (move == UP and blank_x != len(board[0]) - 1) or \
            (move == DOWN and blank_x != 0) or \
@@ -159,12 +155,15 @@ def draw_board(board, message):
     DISPLAYSURF.blit(DFS_SURF, DFS_RECT)
     DISPLAYSURF.blit(IDS_SURF, IDS_RECT)
     DISPLAYSURF.blit(TIMER_SURF, TIMER_RECT)
+    DISPLAYSURF.blit(RESET_SURF, RESET_RECT)
+    DISPLAYSURF.blit(NEWGAME_SURF, NEWGAME_RECT)
+    DISPLAYSURF.blit(STEP_SURF, STEP_RECT)
 
 def slide_animation(board, direction, message, animationSpeed):
     # Note: This function does not check if the move is valid.
 
     blankx, blanky = get_blank_position(len(board), board)
-    print("slideanim", blankx, blanky)
+    # print("slideanim", blankx, blanky)
     if direction == UP:
         movex = blankx + 1
         movey = blanky 
@@ -177,7 +176,7 @@ def slide_animation(board, direction, message, animationSpeed):
     elif direction == RIGHT:
         movex = blankx 
         movey = blanky - 1
-    print("mx, my", movex, movey)
+    # print("mx, my", movex, movey)
     # prepare the base surface
     draw_board(board, message)
     baseSurf = DISPLAYSURF.copy()
@@ -237,12 +236,12 @@ def reverse_directions(actions):
     return reversed_actions
 
 def IDS_solver_process(given_state, size, max_depth, solution_queue, metrics_queue):
-    elapsed_time, nodes_visited = npuzzle.IDS_with_steps(given_state, size, max_depth, solution_queue)
-    metrics_queue.put((elapsed_time, nodes_visited))  # Send time and node count to the main process
+    elapsed_time, nodes_visited, total_steps = npuzzle.IDS_with_steps(given_state, size, max_depth, solution_queue)
+    metrics_queue.put((elapsed_time, nodes_visited, total_steps))  # Send time and node count to the main process
 
 def DFS_solver_process(given_state, size, solution_queue, metrics_queue):
-    elapsed_time, nodes_visited = npuzzle.DFS_with_steps(given_state, size, solution_queue)
-    metrics_queue.put((elapsed_time, nodes_visited))  # Send time and node count to the main process
+    elapsed_time, nodes_visited, total_steps = npuzzle.DFS_with_steps(given_state, size, solution_queue)
+    metrics_queue.put((elapsed_time, nodes_visited, total_steps))  # Send time and node count to the main process
 
 total_time = 60
 last_update = pygame.time.get_ticks()
@@ -261,6 +260,22 @@ def update_timer():
             WINDOWWIDTH - 160, 5
         )
 
+def convert_to_2D(given_state, size):
+    board = []
+    for i in range(size):
+        row = given_state[i*size:(i+1)*size]
+        board.append([tile if tile != 0 else None for tile in row])
+    return board
+
+def prompt_for_size():
+    """Prompts user to enter the size (k) for a new puzzle."""
+    size = input("Enter the size for a new puzzle (e.g., 3 for 3x3): ")
+    try:
+        return int(size)
+    except ValueError:
+        print("Invalid input. Please enter an integer greater than or equal to 2.")
+        return None
+
 def main():
     input_file_path = "input.txt"
 
@@ -272,10 +287,7 @@ def main():
     size, given_state = puzzles[0]
 
     # Convert initial_state to a 2D board
-    board = []
-    for i in range(size):
-        row = given_state[i*size:(i+1)*size]
-        board.append([tile if tile != 0 else None for tile in row])
+    board = convert_to_2D(given_state, size)
 
     solution_queue = Queue()
     metrics_queue = Queue()
@@ -286,7 +298,7 @@ def main():
 
     # Initialize Pygame
     pygame.init()
-    global FPSCLOCK, DISPLAYSURF, BASICFONT, TIME_SURF, TIME_RECT, NODES_SURF, NODES_RECT, TIMER_SURF, TIMER_RECT, DFS_SURF, DFS_RECT, IDS_SURF, IDS_RECT, BOARDHEIGHT, BOARDWIDTH, XMARGIN, YMARGIN
+    global FPSCLOCK, DISPLAYSURF, BASICFONT, TIME_SURF, TIME_RECT, NODES_SURF, NODES_RECT, TIMER_SURF, TIMER_RECT, DFS_SURF, DFS_RECT, IDS_SURF, IDS_RECT, BOARDHEIGHT, BOARDWIDTH, XMARGIN, YMARGIN, RESET_SURF, RESET_RECT, total_time, last_update, NEWGAME_SURF, NEWGAME_RECT, STEP_SURF, STEP_RECT
     FPSCLOCK = pygame.time.Clock()
     DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
     pygame.display.set_caption('n-puzzle')
@@ -301,17 +313,21 @@ def main():
     is_solving = False
     elapsed_time = None
     nodes_visited = None
+    total_moves = None
     start_time = time.time()
     timeout_reached = False
     status_message = "Choose an algorithm to solve the puzzle!"
     start_timer = False
 
-    # Prepare surfaces for time and nodes count display
-    TIME_SURF, TIME_RECT = make_text('Time: ' + str(elapsed_time) + ' (s)', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 600, WINDOWHEIGHT - 60)
-    NODES_SURF, NODES_RECT = make_text('Nodes visited: ' + str(nodes_visited), TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 600, WINDOWHEIGHT - 30)
+    # Buttons and text for the UI
+    TIME_SURF, TIME_RECT = make_text('Time: ' + str(elapsed_time) + ' (s)', TEXTCOLOR, TILECOLOR, 5, 30)
+    NODES_SURF, NODES_RECT = make_text('Nodes visited: ' + str(nodes_visited), TEXTCOLOR, TILECOLOR, 5, 60)
+    STEP_SURF, STEP_RECT = make_text('Total steps: ' + str(total_moves), TEXTCOLOR, TILECOLOR, 5, 90)
     TIMER_SURF, TIMER_RECT = make_text('Time left: ' + str(total_time) + ' (s)', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 160, 5)
-    DFS_SURF, DFS_RECT = make_text('DFS', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 260, 40)
-    IDS_SURF, IDS_RECT = make_text('IDS', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 420, 40)
+    DFS_SURF, DFS_RECT = make_text('DFS', TEXTCOLOR, TILECOLOR, 480, 670)
+    IDS_SURF, IDS_RECT = make_text('IDS', TEXTCOLOR, TILECOLOR, 480, 700)
+    RESET_SURF, RESET_RECT = make_text('Reset Puzzle', TEXTCOLOR,TILECOLOR, 240, 670)
+    NEWGAME_SURF, NEWGAME_RECT = make_text('New Puzzle', TEXTCOLOR, TILECOLOR, 240, 700)
 
     while True:
         check_for_quit()
@@ -325,25 +341,83 @@ def main():
                     if DFS_RECT.collidepoint(event.pos):
                         if not DFS_solver.is_alive():
                             start_timer = True
+                            DFS_solver = Process(target=DFS_solver_process, args=(given_state, size, solution_queue, metrics_queue))
                             DFS_solver.start()
                             is_solving = True
                             print("DFS started")
                             start_time = time.time()
                             timeout_reached = False
                             if metrics_queue.qsize() > 0 and elapsed_time is None:
-                                elapsed_time, nodes_visited = metrics_queue.get()
-
+                                elapsed_time, nodes_visited, total_moves = metrics_queue.get()
                     # Start IDS solver
                     elif IDS_RECT.collidepoint(event.pos):
                         if not IDS_solver.is_alive():
                             start_timer = True
+                            IDS_solver = Process(target=IDS_solver_process, args=(given_state, size, 80, solution_queue, metrics_queue))
                             IDS_solver.start()
                             is_solving = True
                             print("IDS started")
                             start_time = time.time()
                             timeout_reached = False
                             if metrics_queue.qsize() > 0 and elapsed_time is None:
-                                elapsed_time, nodes_visited = metrics_queue.get()
+                                elapsed_time, nodes_visited, total_moves = metrics_queue.get()
+                    if RESET_RECT.collidepoint(event.pos):
+                        board = convert_to_2D(given_state, size)
+                        all_moves = []
+                        is_solving = False
+                        elapsed_time = None
+                        nodes_visited = None
+                        total_moves = None
+                        start_timer = False
+                        timeout_reached = False
+                        total_time = 60
+                        status_message = "Choose an algorithm to solve the puzzle!"
+                        start_time = time.time()
+                        if DFS_solver.is_alive():
+                            DFS_solver.terminate()
+                        if IDS_solver.is_alive():
+                            IDS_solver.terminate()
+                        TIME_SURF, TIME_RECT = make_text('Time: ' + str(elapsed_time) + ' (s)', TEXTCOLOR, TILECOLOR, 5, 30)
+                        NODES_SURF, NODES_RECT = make_text('Nodes visited: ' + str(nodes_visited), TEXTCOLOR, TILECOLOR, 5, 60)
+                        STEP_SURF, STEP_RECT = make_text('Total steps: ' + str(total_moves), TEXTCOLOR, TILECOLOR, 5, 90)
+                        TIMER_SURF, TIMER_RECT = make_text('Time left: ' + str(total_time) + ' (s)', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 160, 5)
+                        DFS_SURF, DFS_RECT = make_text('DFS', TEXTCOLOR, TILECOLOR, 480, 670)
+                        IDS_SURF, IDS_RECT = make_text('IDS', TEXTCOLOR, TILECOLOR, 480, 700)
+                        RESET_SURF, RESET_RECT = make_text('Reset Puzzle', TEXTCOLOR,TILECOLOR, 240, 670)
+                        NEWGAME_SURF, NEWGAME_RECT = make_text('New Puzzle', TEXTCOLOR, TILECOLOR, 240, 700)
+                    if NEWGAME_RECT.collidepoint(event.pos):
+                        k = prompt_for_size()
+                        if k is not None and k >= 2:
+                            new_puzzle = test.generate_puzzle(k)
+                            test.write_puzzle_to_file(new_puzzle, k)
+                            BOARDHEIGHT = k
+                            BOARDWIDTH = k
+                            print(f"New {k}x{k} puzzle generated and loaded.")
+                        puzzles = npuzzle.readInput(input_file_path)                        
+                        size, given_state = puzzles[0]
+                        board = convert_to_2D(given_state, size)
+                        all_moves = []
+                        is_solving = False
+                        elapsed_time = None
+                        nodes_visited = None
+                        total_moves = None
+                        start_timer = False
+                        timeout_reached = False
+                        total_time = 60
+                        status_message = "Choose an algorithm to solve the puzzle!"
+                        start_time = time.time()
+                        if DFS_solver.is_alive():
+                            DFS_solver.terminate()
+                        if IDS_solver.is_alive():
+                            IDS_solver.terminate()
+                        TIME_SURF, TIME_RECT = make_text('Time: ' + str(elapsed_time) + ' (s)', TEXTCOLOR, TILECOLOR, 5, 30)
+                        NODES_SURF, NODES_RECT = make_text('Nodes visited: ' + str(nodes_visited), TEXTCOLOR, TILECOLOR, 5, 60)
+                        STEP_SURF, STEP_RECT = make_text('Total steps: ' + str(total_moves), TEXTCOLOR, TILECOLOR, 5, 90)
+                        TIMER_SURF, TIMER_RECT = make_text('Time left: ' + str(total_time) + ' (s)', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 160, 5)
+                        DFS_SURF, DFS_RECT = make_text('DFS', TEXTCOLOR, TILECOLOR, 480, 670)
+                        IDS_SURF, IDS_RECT = make_text('IDS', TEXTCOLOR, TILECOLOR, 480, 700)
+                        RESET_SURF, RESET_RECT = make_text('Reset Puzzle', TEXTCOLOR,TILECOLOR, 240, 670)
+                        NEWGAME_SURF, NEWGAME_RECT = make_text('New Puzzle', TEXTCOLOR, TILECOLOR, 240, 700)
 
         # Check if the 60-second limit has been reached
         DISPLAYSURF.blit(TIMER_SURF, TIMER_RECT)
@@ -367,10 +441,10 @@ def main():
                 print("IDS took too long to solve...")
 
             if metrics_queue.qsize() > 0 and elapsed_time is None:
-                elapsed_time, nodes_visited = metrics_queue.get()
+                elapsed_time, nodes_visited, total_moves = metrics_queue.get()
 
         if metrics_queue.qsize() > 0 and elapsed_time is None:
-            elapsed_time, nodes_visited = metrics_queue.get()
+            elapsed_time, nodes_visited, total_moves = metrics_queue.get()
 
         # Read moves from solution_queue if time has not run out
         if not timeout_reached:
@@ -384,12 +458,12 @@ def main():
 
         # Prepare reversed moves for animation
         reversed_moves = reverse_directions(all_moves)
-
+        
         # Draw the current board and status
         draw_board(board, status_message)
         if is_solving:
             status_message = "Solving the puzzle..."
-        elif not is_solving:
+        elif not is_solving and elapsed_time is not None:
             if not timeout_reached and elapsed_time is not None:
                 status_message = "Solved!"
             elif timeout_reached and elapsed_time is None:
@@ -397,8 +471,9 @@ def main():
         draw_board(board, status_message)
 
         if elapsed_time is not None or nodes_visited is not None:
-            TIME_SURF, TIME_RECT = make_text('Time: ' + str(elapsed_time) + ' (s)', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 600, WINDOWHEIGHT - 60)
-            NODES_SURF, NODES_RECT = make_text('Nodes visited: ' + str(nodes_visited), TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 600, WINDOWHEIGHT - 30)
+            TIME_SURF, TIME_RECT = make_text('Time: ' + str(elapsed_time) + ' (s)', TEXTCOLOR, TILECOLOR, 5, 30)
+            NODES_SURF, NODES_RECT = make_text('Nodes visited: ' + str(nodes_visited), TEXTCOLOR, TILECOLOR, 5, 60)
+            STEP_SURF, STEP_RECT = make_text('Total steps: ' + str(total_moves), TEXTCOLOR, TILECOLOR, 5, 90)
         DISPLAYSURF.blit(TIME_SURF, TIME_RECT)
         DISPLAYSURF.blit(NODES_SURF, NODES_RECT)
 
