@@ -392,6 +392,8 @@ def main():
                             test.write_puzzle_to_file(new_puzzle, k)
                             BOARDHEIGHT = k
                             BOARDWIDTH = k
+                            XMARGIN = int((WINDOWWIDTH - (TILESIZE * BOARDWIDTH + (BOARDWIDTH - 1))) / 2)
+                            YMARGIN = int((WINDOWHEIGHT - (TILESIZE * BOARDHEIGHT + (BOARDHEIGHT - 1))) / 2)
                             print(f"New {k}x{k} puzzle generated and loaded.")
                         puzzles = npuzzle.readInput(input_file_path)                        
                         size, given_state = puzzles[0]
