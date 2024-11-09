@@ -7,7 +7,7 @@ import time
 
 TILESIZE = 80
 WINDOWWIDTH = 800
-WINDOWHEIGHT = 800
+WINDOWHEIGHT = 640
 FPS = 60
 BLANK = None
 
@@ -324,10 +324,10 @@ def main():
     NODES_SURF, NODES_RECT = make_text('Nodes visited: ' + str(nodes_visited), TEXTCOLOR, TILECOLOR, 5, 60)
     STEP_SURF, STEP_RECT = make_text('Total steps: ' + str(total_moves), TEXTCOLOR, TILECOLOR, 5, 90)
     TIMER_SURF, TIMER_RECT = make_text('Time left: ' + str(total_time) + ' (s)', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 160, 5)
-    DFS_SURF, DFS_RECT = make_text('DFS', TEXTCOLOR, TILECOLOR, 480, 670)
-    IDS_SURF, IDS_RECT = make_text('IDS', TEXTCOLOR, TILECOLOR, 480, 700)
-    RESET_SURF, RESET_RECT = make_text('Reset Puzzle', TEXTCOLOR,TILECOLOR, 240, 670)
-    NEWGAME_SURF, NEWGAME_RECT = make_text('New Puzzle', TEXTCOLOR, TILECOLOR, 240, 700)
+    DFS_SURF, DFS_RECT = make_text('DFS', TEXTCOLOR, TILECOLOR, 480, 570)
+    IDS_SURF, IDS_RECT = make_text('IDS', TEXTCOLOR, TILECOLOR, 480, 600)
+    RESET_SURF, RESET_RECT = make_text('Reset Puzzle', TEXTCOLOR,TILECOLOR, 240, 570)
+    NEWGAME_SURF, NEWGAME_RECT = make_text('New Puzzle', TEXTCOLOR, TILECOLOR, 240, 600)
 
     while True:
         check_for_quit()
@@ -381,10 +381,10 @@ def main():
                         NODES_SURF, NODES_RECT = make_text('Nodes visited: ' + str(nodes_visited), TEXTCOLOR, TILECOLOR, 5, 60)
                         STEP_SURF, STEP_RECT = make_text('Total steps: ' + str(total_moves), TEXTCOLOR, TILECOLOR, 5, 90)
                         TIMER_SURF, TIMER_RECT = make_text('Time left: ' + str(total_time) + ' (s)', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 160, 5)
-                        DFS_SURF, DFS_RECT = make_text('DFS', TEXTCOLOR, TILECOLOR, 480, 670)
-                        IDS_SURF, IDS_RECT = make_text('IDS', TEXTCOLOR, TILECOLOR, 480, 700)
-                        RESET_SURF, RESET_RECT = make_text('Reset Puzzle', TEXTCOLOR,TILECOLOR, 240, 670)
-                        NEWGAME_SURF, NEWGAME_RECT = make_text('New Puzzle', TEXTCOLOR, TILECOLOR, 240, 700)
+                        DFS_SURF, DFS_RECT = make_text('DFS', TEXTCOLOR, TILECOLOR, 480, 570)
+                        IDS_SURF, IDS_RECT = make_text('IDS', TEXTCOLOR, TILECOLOR, 480, 600)
+                        RESET_SURF, RESET_RECT = make_text('Reset Puzzle', TEXTCOLOR,TILECOLOR, 240, 570)
+                        NEWGAME_SURF, NEWGAME_RECT = make_text('New Puzzle', TEXTCOLOR, TILECOLOR, 240, 600)
                     if NEWGAME_RECT.collidepoint(event.pos):
                         k = prompt_for_size()
                         if k is not None and k >= 2:
@@ -416,10 +416,10 @@ def main():
                         NODES_SURF, NODES_RECT = make_text('Nodes visited: ' + str(nodes_visited), TEXTCOLOR, TILECOLOR, 5, 60)
                         STEP_SURF, STEP_RECT = make_text('Total steps: ' + str(total_moves), TEXTCOLOR, TILECOLOR, 5, 90)
                         TIMER_SURF, TIMER_RECT = make_text('Time left: ' + str(total_time) + ' (s)', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 160, 5)
-                        DFS_SURF, DFS_RECT = make_text('DFS', TEXTCOLOR, TILECOLOR, 480, 670)
-                        IDS_SURF, IDS_RECT = make_text('IDS', TEXTCOLOR, TILECOLOR, 480, 700)
-                        RESET_SURF, RESET_RECT = make_text('Reset Puzzle', TEXTCOLOR,TILECOLOR, 240, 670)
-                        NEWGAME_SURF, NEWGAME_RECT = make_text('New Puzzle', TEXTCOLOR, TILECOLOR, 240, 700)
+                        DFS_SURF, DFS_RECT = make_text('DFS', TEXTCOLOR, TILECOLOR, 480, 570)
+                        IDS_SURF, IDS_RECT = make_text('IDS', TEXTCOLOR, TILECOLOR, 480, 600)
+                        RESET_SURF, RESET_RECT = make_text('Reset Puzzle', TEXTCOLOR,TILECOLOR, 240, 570)
+                        NEWGAME_SURF, NEWGAME_RECT = make_text('New Puzzle', TEXTCOLOR, TILECOLOR, 240, 600)
 
         # Check if the 60-second limit has been reached
         DISPLAYSURF.blit(TIMER_SURF, TIMER_RECT)

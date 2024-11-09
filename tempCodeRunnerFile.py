@@ -1,1 +1,1 @@
-total_moves = len(all_moves)
+670
